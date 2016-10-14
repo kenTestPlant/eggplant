@@ -1,0 +1,201 @@
+﻿
+function TypeWindowsPhone textToType, layout
+	
+	// Calculate key dimensions and position of top left key relative to the screen hight with the PMS (ProjectMyScreen) app running full screen
+	
+	// The numeric values were measured from a screen with a hight of 600. It is assumed all other screen sizes scale proportionally.
+	set ScreenSize = RemoteScreenSize()
+	set midx = ScreenSize.x/2 // centre of screen
+	set cell = (ScreenSize.y *28/600, screensize.y * 44/600) //  key size.
+	//set TL_key = (midx - (cell.x*4.5), (screensize.y * 342/600)) // position of top left key
+	if layout = 1 then
+		// in store
+		put (514,398,525,414) into TL_key
+	else if layout = 2 then
+		// app search
+		put (515,420,525,436) into TL_key
+	end if
+	
+	// x,y coordinates of common keys
+	set shiftKey = (TL_key.x, TL_key.y + 2* cell.y)
+	set returnKey = (midx + (4.5 * cell.x), shiftKey.y + cell.y)
+	set spacekey = (midx, returnKey.y)
+	set kb_switch = (TL_key.x, spacekey.y) // 123/abc key
+	
+	// Change the following  7 strings for different language keyboards
+	
+	// characters on the letter keyboard.
+	set letters1 = "qwertyuiop"
+	set letters2 = "asdfghjkl"
+	set letters3 = "zxcvbnm"
+	
+	// The symbols on the numeric keyboard. The numbers on the top row are assumed to be 1,2,3,4,5,6,7,8,9,0
+	set symb1 = "@#$%&*()-\"
+	set symb2 = "!;:'" & quote & "?/"
+	
+	// Symbols after the shift/second symols set of pressed
+	set symb3 = "^[]{}<>" & euroSign & "£" & yenSign
+	set symb4 = bullet & "-+=_~|"
+	
+	// the position of these keys are the same on every keyboard
+	set fixedKeys = {
+		(return):returnKey, 
+		(space):spacekey,
+		(comma):(midx - 2*cell.x, spacekey.y),
+		(period):(midx + 3*cell.x, spacekey.y)
+	}
+	
+	// for the NumPad of the keyboard
+	set line1 = "123"
+	set line2 = "456 "
+	set line3 = "789"
+	set line4 = "*0#;"
+	
+	set num_switch = (2,3)
+	
+	set tlb = (550,370) #middle point of top left button
+	set button_dim = (90,60) #buttons dimension	
+	
+	// These  values are used to track the state of the keyboard
+	// Note that some keys or key combinations change the keyboard state, e.g A space after a symbol will switch to letters.
+	// On other language keyboards the rules may be different so the code where these are used may need changing.
+	set KB_upper = false // keyboard letter case
+	set KB_symb = false // symbols
+	set KB_symb2 = false // second set of symbols
+	
+	set prevChar = "" // need to check previous char for change keyboard state e.g. period & space causes a switch to upper case.
+	
+	
+	repeat with c = each character of textToType
+		if c is a letter
+			if KB_symb is true 
+				tap kb_switch
+				set KB_symb = false
+				set KB_symb2 = false
+			end if
+			set l = lowercase(c)
+			if l is in letters1
+				set row = 0
+				set col = offset of c in letters1 -1
+				set S = TL_key
+			else if l is in letters2
+				set row = 1
+				set col = offset of c in letters2 -1
+				set S = (midx - (cell.x*4), TL_key.y + cell.y)
+			else if l is in letters3
+				set row = 2
+				set col = offset of c in letters3 -1
+				set S = (midx - (cell.x*3), TL_key.y + (2*cell.y))
+			end if
+			
+			if c is a uppercase and KB_upper is false 
+				tap shiftKey
+				set KB_upper = true
+			else if c is a lowercase and KB_upper is true 
+				tap shiftKey
+				set KB_upper = false
+			end if
+			
+			tap(S.x + (cell.x*col), S.y)
+			set KB_upper = false // a typed letter always sets the keyboard to lower case
+			
+		else if c is a number
+			
+			if KB_symb is false 
+				tap kb_switch
+				set KB_symb = true
+			end if
+			
+			repeat with c = each character of textToType
+				
+			end repeat
+			
+		else if c is in fixedKeys.keys
+			
+			
+			tap fixedKeys.(c)
+			if c is return or c is space and prevChar is not a number
+				set KB_symb = false
+				set KB_symb2 = false
+				if c is return then set KB_upper = true // a return sets upper case
+			end if
+			
+		else if c is in symb1
+			if KB_symb is false 
+				tap kb_switch
+				set KB_symb = true
+				set KB_symb2 = false
+			end if
+			if KB_symb2 is true 
+				tap shiftKey
+				set KB_symb2 = false
+			end if
+			set col = offset of c in symb1 -1
+			tap (TL_key.x + (cell.x*col), TL_key.y + cell.y)
+			
+			if c is in "@\" // causes keyboard to be set to letters
+				set KB_symb = false
+			end if
+			
+		else if c is in symb2
+			if KB_symb is false 
+				tap kb_switch
+				set KB_symb = true
+				set KB_symb2 = false
+			end if
+			if KB_symb2 is true 
+				tap shiftKey
+				set KB_symb2 = false
+			end if
+			set col = offset of c in symb2 -1
+			tap (midx - (cell.x*3) + (cell.x*col), TL_key.y + 2*cell.y)
+			
+			if c is apostrophe
+				set KB_symb = false //an apostrophe set keyboard back to letters
+			end if
+			
+		else if c is in symb3
+			if KB_symb is false 
+				tap kb_switch
+				set KB_symb = true
+				set KB_symb2 = false
+			end if
+			if KB_symb2 is false 
+				tap shiftKey
+				set KB_symb2 = true
+			end if
+			set col = offset of c in symb3 -1
+			tap (TL_key.x + (cell.x*col), TL_key.y + cell.y)
+			
+		else if c is in symb4
+			if KB_symb is false 
+				tap kb_switch
+				set KB_symb = true
+				set KB_symb2 = false
+			end if
+			if KB_symb2 is false 
+				tap shiftKey
+				set KB_symb2 = true
+			end if
+			set col = offset of c in symb4 -1
+			tap (midx - (cell.x*3) + (cell.x*col), TL_key.y + 2*cell.y)
+		else
+			LogWarning c  && "is not supported in this keyboard handler."	
+		end if
+		
+		if prevChar is in ".!?" and c is space
+			set KB_upper = true
+			set KB_symb = false
+			set KB_symb2 = false
+		end if
+		set prevChar = c
+	end repeat
+	
+	// Set keyboard back to letters on exit
+	if KB_symb is true 
+		tap kb_switch
+	end if
+	
+	tap returnKey
+	
+end TypeWindowsPhone

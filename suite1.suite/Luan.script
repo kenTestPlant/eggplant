@@ -1,0 +1,24 @@
+﻿set myFile to file "~/Documents/design5.csv" 
+repeat with line 1 to  5 of myFile
+	if it contains "Run Date" then add 1 to myCounter
+	(*	count the number of "Run Date"  to myCounter*)
+end repeat
+put mycounter
+
+repeat with csvCells = line1 to line 5 of file OriginalDesignCsv
+	
+	
+	
+	put "Thread 1" && return into myfile --start with the header
+	RunWithNewResults "HelloWorld" --run a script
+	put the result.logfile into myLogging --put the results of the script run into container
+	put file myLogging after myFile --write the contents of the log file to my personal log file
+	put  myfile --show the contents of the log file
+	
+	typetext "123"
+	
+	tap "LeftSpinBR"
+	
+	Tap (text: "hubbabubba")
+	
+	Connect (serverID: "10.211.55.4", portNum: "5900", username: "harris", password: "3ggpl@nt", Visible: "Yes")

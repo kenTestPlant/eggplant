@@ -1,0 +1,21 @@
+﻿(*Log "Hodwy from Untitled 1"
+
+put readtext("TableBR", "TLTable", contrast: on)*)
+
+put (350, 150) into TLLoc --configure coordinates of first box 
+put (444, 180) into BRLoc
+put readtext(TLLoc, BRLoc) after mylist --Read first box and add to list 
+Repeat 8 times --Use repeat loop to read the rest of the boxes
+	put ", "after mylist --Use repeat
+	add (0, 60) to TLLoc --add 60 pixels to y coord  of TL and BR to move down to next box
+	add (0, 60) to BRLoc 
+	put readtext(TLLoc, BRLoc) after mylist
+end repeat
+
+put mylist
+
+
+
+
+
+

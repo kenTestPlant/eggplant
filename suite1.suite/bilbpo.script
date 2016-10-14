@@ -1,0 +1,10 @@
+﻿put 10 into myNumber
+put readtext("LeftSpinTL", "LeftSpinBR") into myDisplayedNumber --Read the current number in focus
+repeat until myDisplayedNumber = myNumber
+	if myDisplayedNumber > myNumber then
+		Tap "SpinDownImage"
+	else if myDisplayedNumber < myNumber then
+		Tap "SpinUpImage"
+	end if
+	put readtext("LeftSpinTL", "LeftSpinBR") into myDisplayedNumber --Read the new displayed number
+end repeat

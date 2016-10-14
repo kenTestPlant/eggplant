@@ -1,0 +1,15 @@
+﻿(*Log "Hello from Untitled--not in a schedule"*)
+
+put "01".."12" into DOBMonth
+put dobmonth
+set PatMonth to any item of DOBMonth
+put patmonth
+put 01..28 into DOBDate
+set PatDate to any item of DOBDate
+put 1955..2000 into DOBYear
+set PatYear to any item of DOBYear
+TypeText PatMonth
+Wait 2
+TypeText PatDate
+Wait 2
+TypeText PatYear, tab

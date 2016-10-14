@@ -1,0 +1,126 @@
+﻿Repeat forever
+	repeat with c = each character of textToType
+		if c is a letter
+			if KB_symb is true 
+				tap kb_switch
+				set KB_symb = false
+				set KB_symb2 = false
+			end if
+			set l = lowercase(c)
+			if l is in letters1
+				set row = 0
+				set col = offset of c in letters1 -1
+				set S = TL_key
+			else if l is in letters2
+				set row = 1
+				set col = offset of c in letters2 -1
+				set S = (midx - (cell.x*4), TL_key.y + cell.y)
+			else if l is in letters3
+				set row = 2
+				set col = offset of c in letters3 -1
+				set S = (midx - (cell.x*3), TL_key.y + (2*cell.y))
+			end if
+			
+			if c is a uppercase and KB_upper is false 
+				tap shiftKey
+				set KB_upper = true
+			else if c is a lowercase and KB_upper is true 
+				tap shiftKey
+				set KB_upper = false
+			end if
+			
+			tap(S.x + (cell.x*col), S.y)
+			set KB_upper = false // a typed letter always sets the keyboard to lower case
+			
+		else if c is a number
+			
+			if KB_symb is false 
+				tap kb_switch
+				set KB_symb = true
+			end if
+			
+			repeat with c = each character of textToType
+				
+			end repeat
+			
+		else if c is in fixedKeys.keys
+			
+			
+			tap fixedKeys.(c)
+			if c is return or c is space and prevChar is not a number
+				set KB_symb = false
+				set KB_symb2 = false
+				if c is return then set KB_upper = true // a return sets upper case
+			end if
+			
+		else if c is in symb1
+			if KB_symb is false 
+				tap kb_switch
+				set KB_symb = true
+				set KB_symb2 = false
+			end if
+			if KB_symb2 is true 
+				tap shiftKey
+				set KB_symb2 = false
+			end if
+			set col = offset of c in symb1 -1
+			tap (TL_key.x + (cell.x*col), TL_key.y + cell.y)
+			
+			if c is in "@\" // causes keyboard to be set to letters
+				set KB_symb = false
+			end if
+			
+		else if c is in symb2
+			if KB_symb is false 
+				tap kb_switch
+				set KB_symb = true
+				set KB_symb2 = false
+			end if
+			if KB_symb2 is true 
+				tap shiftKey
+				set KB_symb2 = false
+			end if
+			set col = offset of c in symb2 -1
+			tap (midx - (cell.x*3) + (cell.x*col), TL_key.y + 2*cell.y)
+			
+			if c is apostrophe
+				set KB_symb = false //an apostrophe set keyboard back to letters
+			end if
+			
+		else if c is in symb3
+			if KB_symb is false 
+				tap kb_switch
+				set KB_symb = true
+				set KB_symb2 = false
+			end if
+			if KB_symb2 is false 
+				tap shiftKey
+				set KB_symb2 = true
+			end if
+			set col = offset of c in symb3 -1
+			tap (TL_key.x + (cell.x*col), TL_key.y + cell.y)
+			
+		else if c is in symb4
+			if KB_symb is false 
+				tap kb_switch
+				set KB_symb = true
+				set KB_symb2 = false
+			end if
+			if KB_symb2 is false 
+				tap shiftKey
+				set KB_symb2 = true
+			end if
+			set col = offset of c in symb4 -1
+			tap (midx - (cell.x*3) + (cell.x*col), TL_key.y + 2*cell.y)
+		else
+			LogWarning c  && "is not supported in this keyboard handler."	
+		end if
+		
+		if prevChar is in ".!?" and c is space
+			set KB_upper = true
+			set KB_symb = false
+			set KB_symb2 = false
+		end if
+		set prevChar = c
+	end repeat
+End repeat
