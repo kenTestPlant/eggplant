@@ -22,3 +22,6 @@ repeat with csvCells = line1 to line 5 of file OriginalDesignCsv
 	Tap (text: "hubbabubba")
 	
 	Connect (serverID: "10.211.55.4", portNum: "5900", username: "harris", password: "3ggpl@nt", Visible: "Yes")
+	
+	
+	----how do i get this to come down
